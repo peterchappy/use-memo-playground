@@ -1,0 +1,21 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.perf-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.perf-table {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.perf-table-item {
+  grid-column: span 1;
+}
