@@ -22,7 +22,7 @@ const bubbleSort = (arr: number[]): number[] => {
   return arr;
 };
 
-export const Quadratic: FC<QuadraticProps> = ({ data, rerenderCount }) => {
+export const MemoQuadratic: FC<QuadraticProps> = ({ data, rerenderCount }) => {
   performance.mark("start-memo");
 
   const displayData = useMemo(() => {
@@ -40,3 +40,19 @@ export const Quadratic: FC<QuadraticProps> = ({ data, rerenderCount }) => {
     >{`${measure?.duration}ms`}</p>
   );
 };
+
+export const Quadratic: FC<QuadraticProps> = ({ data, rerenderCount }) => {
+  performance.mark("start-memo");
+  const displayData =  bubbleSort(data);
+  const name = `${QUADRATIC_PERF_NAME}-length-${data.length}`;
+  performance.mark("end-memo");
+  performance.measure(name, "start-memo", "end-memo");
+  const measure = performance.getEntriesByName(name).pop();
+
+  return (
+    <p
+      data-testid={`${rerenderCount} ${displayData.length}`}
+    >{`${measure?.duration}ms`}</p>
+  );
+};
+

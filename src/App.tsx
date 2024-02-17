@@ -1,26 +1,14 @@
 import { useState } from "react";
 import "./App.css";
-import { Constant } from "./Constant";
-import { Linear } from "./Linear";
-import { Quadratic } from "./Quadratic";
-import { Linearithmic } from "./Linearithmic";
+import { Constant, MemoConstant } from "./Constant";
+import { Linear, MemoLinear } from "./Linear";
+import { MemoQuadratic, Quadratic } from "./Quadratic";
+import { Linearithmic, MemoLinearithmic } from "./Linearithmic";
 
-const MAX_N = 1_000_000;
-
-type PerfType = "linear" | "constant" | "quadratic";
-
-type PerfMetrics = Record<
-  PerfType,
-  Array<{ duration: number; render: number }>
->;
+const MAX_N = 100_000;
 
 function App() {
   const [triggerRerender, setTriggerRerender] = useState(0);
-  const [perfMetrics, setPerfMetrics] = useState({
-    constant: [],
-    linear: [],
-    quadratic: [],
-  });
 
   const [data, setData] = useState(
     Array.from({ length: MAX_N }, () => Math.floor(Math.random() * MAX_N)),
@@ -36,28 +24,22 @@ function App() {
     );
   };
 
-  const ten = data.slice(0, 10);
-  const hundred = data.slice(0, 100);
   const thousand = data.slice(0, 1000);
   const tenThousand = data.slice(0, 10000);
-  const hundredThousand = data.slice(0, 100_000);
-  const million = data;
+  const hundredThousand = data;
 
   return (
-    <>
+    <div className="perf-root">
+      <button onClick={handleRerender}>Re-render</button>
+      <button onClick={handleDataReset}>Reset</button>
+
+      <h1>Without Memo</h1>
       <div className="perf-table">
-        <div style={{ gridColumn: "1 / -1" }}>
-          <button onClick={handleRerender}>Re-render</button>
-        </div>
-        <div style={{ gridColumn: "1 / -1" }}>
-          <button onClick={handleDataReset}>Reset</button>
-        </div>
         {/* header */}
         <div className="perf-table-item" />
         <div className="perf-table-item">1,000 items</div>
         <div className="perf-table-item">10,0000 items</div>
         <div className="perf-table-item">100,0000 items</div>
-        <div className="perf-table-item">1,000,0000 items</div>
 
         {/* Constant */}
         <p className="perf-table-item">O(1)</p>
@@ -71,9 +53,6 @@ function App() {
         <div className="perf-table-item">
           <Constant data={hundredThousand} rerenderCount={triggerRerender} />
         </div>
-        <div className="perf-table-item">
-          <Constant data={million} rerenderCount={triggerRerender} />
-        </div>
 
         {/* Linear */}
         <p className="perf-table-item">O(n)</p>
@@ -85,9 +64,6 @@ function App() {
         </div>
         <div className="perf-table-item">
           <Linear data={hundredThousand} rerenderCount={triggerRerender} />
-        </div>
-        <div className="perf-table-item">
-          <Linear data={million} rerenderCount={triggerRerender} />
         </div>
 
         <p className="perf-table-item">O(nlogn)</p>
@@ -103,10 +79,6 @@ function App() {
             rerenderCount={triggerRerender}
           />
         </div>
-        <div className="perf-table-item">
-          {/* <Linearithmic data={million} rerenderCount={triggerRerender} /> */}
-          <p>N/A</p>
-        </div>
 
         {/* Quadratic */}
         <p className="perf-table-item">O(n^2)</p>
@@ -119,12 +91,69 @@ function App() {
         <div className="perf-table-item">
           <Quadratic data={hundredThousand} rerenderCount={triggerRerender} />
         </div>
+      </div>
+
+      <h1>With Memo</h1>
+      <div className="perf-table">
+        {/* header */}
+        <div className="perf-table-item" />
+        <div className="perf-table-item">1,000 items</div>
+        <div className="perf-table-item">10,0000 items</div>
+        <div className="perf-table-item">100,0000 items</div>
+
+        {/* Constant */}
+        <p className="perf-table-item">O(1)</p>
+
         <div className="perf-table-item">
-          {/* <Quadratic data={million} rerenderCount={triggerRerender} /> */}
-          <p>N/A</p>
+          <MemoConstant data={thousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoConstant data={tenThousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoConstant data={hundredThousand} rerenderCount={triggerRerender} />
+        </div>
+
+        {/* Linear */}
+        <p className="perf-table-item">O(n)</p>
+        <div className="perf-table-item">
+          <MemoLinear data={thousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoLinear data={tenThousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoLinear data={hundredThousand} rerenderCount={triggerRerender} />
+        </div>
+
+        <p className="perf-table-item">O(nlogn)</p>
+        <div className="perf-table-item">
+          <MemoLinearithmic data={thousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoLinearithmic data={tenThousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoLinearithmic
+            data={hundredThousand}
+            rerenderCount={triggerRerender}
+          />
+        </div>
+
+        {/* Quadratic */}
+        <p className="perf-table-item">O(n^2)</p>
+        <div className="perf-table-item">
+          <MemoQuadratic data={thousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoQuadratic data={tenThousand} rerenderCount={triggerRerender} />
+        </div>
+        <div className="perf-table-item">
+          <MemoQuadratic data={hundredThousand} rerenderCount={triggerRerender} />
         </div>
       </div>
-    </>
+
+    </div>
   );
 }
 

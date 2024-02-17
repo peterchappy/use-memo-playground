@@ -43,7 +43,7 @@ function merge(left: number[], right: number[]): number[] {
 
 // Exampl
 
-export const Linearithmic: FC<LinearithmicProps> = ({
+export const MemoLinearithmic: FC<LinearithmicProps> = ({
   data,
   rerenderCount,
 }) => {
@@ -64,3 +64,25 @@ export const Linearithmic: FC<LinearithmicProps> = ({
     >{`${measure?.duration}ms`}</p>
   );
 };
+
+export const Linearithmic: FC<LinearithmicProps> = ({
+  data,
+  rerenderCount,
+}) => {
+  performance.mark("start-memo");
+
+  const displayData =  mergeSort(data);
+  
+
+  const name = `${LINEARITHMIC_PERF_NAME}-length-${data.length}`;
+  performance.mark("end-memo");
+  performance.measure(name, "start-memo", "end-memo");
+  const measure = performance.getEntriesByName(name).pop();
+
+  return (
+    <p
+      data-testid={`${rerenderCount} ${displayData.length}`}
+    >{`${measure?.duration}ms`}</p>
+  );
+};
+
